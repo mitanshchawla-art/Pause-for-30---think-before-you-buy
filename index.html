@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pause for 30 — This or That?</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --site-primary: #76564b;
+  --site-on-primary: #fffaf2;
+  --site-secondary: #e9bd83;
+  --site-on-secondary: #4c342a;
+  --site-background: #f6eee4;
+  --site-on-background: #49372f;
+  --site-font-body: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --site-font-heading: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); background:radial-gradient(ellipse at 12% 8%,#fff9ef 0,transparent 35%),radial-gradient(ellipse at 88% 35%,#e5d0b8 0,transparent 34%),linear-gradient(145deg,#f7efe5,#e9ddd0 52%,#f8f0e5); background-attachment:fixed; color: var(--site-on-background); }
+#app { min-height: 100vh; width: 100%; background:transparent; color: var(--site-on-background); overflow: hidden; }
+.hero { background:linear-gradient(125deg,#63463d 0%,#806052 48%,#9b765e 100%); color: var(--site-on-primary); padding: calc(42px * var(--site-spacing-scale)) 22px calc(38px * var(--site-spacing-scale)); position: relative; overflow:hidden; box-shadow:0 12px 35px #5b403020; }
+.hero:before,.hero:after { content:""; position:absolute; border-radius:50%; background:var(--site-secondary); opacity:calc(.19 * var(--site-decoration-opacity)); pointer-events:none; filter:blur(1px); }
+.hero:before { width:280px;height:280px;right:-65px;top:-115px; box-shadow:0 0 0 28px #f4d8b21a,0 0 0 58px #f4d8b20d; }
+.hero:after { width:150px;height:150px;left:8%;bottom:-95px; box-shadow:0 0 0 22px #f4d8b21a; }
+.hero-inner { max-width:900px; margin:auto; position:relative; z-index:1; }
+.kicker { text-transform:uppercase; letter-spacing:.16em; font-weight:800; font-size:.75rem; opacity:.86; }
+h1 { font-family:var(--site-font-heading); font-size:calc(clamp(2.1rem, 6vw, 4.4rem) * var(--site-heading-scale)); line-height:.98; margin:12px 0 14px; letter-spacing:-.045em; }
+.hero p { max-width:650px; line-height:1.55; font-size:1.05rem; margin:0; }
+.pill { display:inline-block; background:linear-gradient(135deg,#f4d9ac,#e9bd83); color:var(--site-on-secondary); padding:9px 15px; border-radius:999px; font-weight:800; font-size:.8rem; margin-top:20px; box-shadow:0 4px 12px #3e261b25; }
+.poster-checks { display:flex; flex-wrap:wrap; gap:8px; margin-top:19px; }
+.poster-check { display:inline-flex; align-items:center; gap:7px; padding:9px 12px; border:1px solid #fff5e255; border-radius:14px; background:#fff8ef17; backdrop-filter:blur(8px); font-size:.82rem; font-weight:800; }
+.poster-caption { margin-top:10px!important; font-size:.88rem!important; font-weight:800; color:var(--site-secondary); }
+main { max-width:900px; margin:auto; padding:30px 18px 52px; }
+.topline { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.progress-label { font-weight:800; font-size:.92rem; }
+.progress-track { height:10px; background:#76564b1b; border-radius:99px; overflow:hidden; margin-bottom:23px; box-shadow:inset 0 1px 3px #51392b12; }
+.progress-fill { height:100%; width:0%; background:linear-gradient(90deg,#9a7661,#d3a36f); border-radius:99px; transition:width .25s ease; }
+.panel { background:rgba(255,251,245,.88); color:var(--site-on-background); border:1px solid #fffaf0; border-radius:calc(27px * var(--site-radius-scale)); padding:clamp(20px,4vw,36px); box-shadow:0 18px 48px #654b3817,0 2px 8px #654b380a; backdrop-filter:blur(12px); }
+.category-row { display:flex; align-items:center; gap:12px; margin-bottom:15px; }
+.category-icon { display:grid; place-items:center; width:56px;height:56px; flex-shrink:0; border-radius:19px; background:linear-gradient(145deg,#f4dfbf,#e6bd91); box-shadow:inset 0 1px #fff9e8,0 5px 12px #6a49341a; font-size:1.65rem; }
+.eyebrow { text-transform:uppercase; letter-spacing:.12em; font-size:.72rem; font-weight:900; color:#987054; }
+.category-title { font-size:1.45rem; line-height:1.1; margin:4px 0 0; }
+.prompt { font-size:1.08rem; margin:16px 0 19px; line-height:1.5; }
+.choices { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:stretch; }
+.choice { text-align:left; min-height:138px; border:1.5px solid #d9c5b2; border-radius:21px; padding:19px; background:linear-gradient(145deg,#fffaf4,#f7eee4); color:inherit; cursor:pointer; font:inherit; transition:transform .2s,border-color .2s,background .2s,box-shadow .2s; box-shadow:0 5px 15px #5c42300a; }
+.choice:hover { transform:translateY(-4px); border-color:#9b735a; box-shadow:0 12px 23px #5c423017; }
+.choice:focus-visible,.btn:focus-visible { outline:3px solid #e3a72d; outline-offset:3px; }
+.choice.selected { background:linear-gradient(145deg,#f7e4c8,#f0d4ae); border-color:#987052; box-shadow:0 0 0 3px #d4aa7d35,0 9px 20px #5c423014; }
+.choice .letter { display:block; font-size:.72rem; font-weight:900; letter-spacing:.12em; color:var(--site-primary); margin-bottom:13px; }
+.choice .words { font-size:1.08rem; font-weight:800; line-height:1.3; }
+.or { display:grid; place-items:center; font-weight:900; color:var(--site-primary); font-size:.78rem; }
+.feedback { display:none; margin-top:17px; border-radius:17px; padding:15px 17px; background:linear-gradient(120deg,#f5e5ce,#f8eddd); border:1px solid #ead5b7; line-height:1.6; }
+.feedback.show { display:block; }
+.feedback strong { display:block; margin-bottom:4px; }
+.encouragement { display:none; margin-top:10px; padding:13px 15px; border-radius:15px; background:linear-gradient(120deg,#e5eddf,#f0f1df); border:1px solid #d7e0ce; border-left:4px solid #8a9b72; font-size:.92rem; line-height:1.6; }
+.encouragement.show { display:block; animation:rise .3s ease both; }
+.actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:21px; }
+.btn { border:0; border-radius:999px; padding:13px 20px; cursor:pointer; font:inherit; font-weight:900; transition:transform .18s,box-shadow .18s; }
+.btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 7px 16px #5c42301c; }
+.btn-primary { background:linear-gradient(135deg,#76564b,#96705a); color:#fffaf2; box-shadow:0 5px 14px #76564b2b; }
+.btn-secondary { background:#eee2d5; color:#5b4236; }
+.btn:disabled { opacity:.4; cursor:not-allowed; }
+.bottom-note { text-align:center; margin-top:20px; font-size:.88rem; line-height:1.5; opacity:.8; }
+.sound-row { display:flex; justify-content:flex-end; margin:0 0 12px; }
+.sound-toggle { border:1px solid #d9c5b2; background:#fffaf4; color:#62483b; border-radius:999px; padding:10px 15px; font:inherit; font-weight:800; cursor:pointer; box-shadow:0 4px 12px #5c42300b; }
+.music-note { font-size:.78rem; opacity:.75; align-self:center; margin-right:auto; }
+.choice.pop { animation:pop .32s ease both; }
+.panel.enter { animation:rise .38s ease both; }
+.spark { position:fixed; z-index:5; pointer-events:none; font-size:22px; animation:floatUp .85s ease-out forwards; }
+@keyframes pop { 0%{transform:scale(.96)} 65%{transform:scale(1.025)} 100%{transform:scale(1)} }
+@keyframes rise { from{opacity:.35;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes floatUp { from{opacity:1;transform:translateY(0) rotate(0deg)} to{opacity:0;transform:translateY(-95px) rotate(24deg)} }
+.finish { display:none; text-align:center; }
+.finish.show { display:block; }
+.finish .big { font-size:3.5rem; }
+.finish h2 { font-size:2rem; margin:10px 0; }
+.finish p { line-height:1.6; max-width:580px; margin:0 auto 20px; }
+.finish-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; text-align:left; margin:22px 0; }
+.finish-item { padding:12px; border-radius:12px; background:color-mix(in srgb, var(--site-primary) 8%, transparent); font-size:.9rem; }
+footer { text-align:center; padding:0 18px 32px; font-size:.84rem; opacity:.78; }
+@media(max-width:560px) { .choices { grid-template-columns:1fr; } .choice { min-height:94px; } .or { padding:0; } .or span { background:var(--site-secondary); color:var(--site-on-secondary); border-radius:99px; padding:4px 10px; } .finish-grid { grid-template-columns:1fr; } }
+@media(prefers-reduced-motion:reduce) { * { transition:none!important; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hero"><div class="hero-inner">
+    <div class="kicker">A tiny pause • A smarter choice</div>
+    <h1>PAUSE FOR 30:<br>THIS OR THAT?</h1>
+    <p>Before you buy, take a breath. Pick between two everyday choices, think about what matters to you, and discover small ways to shop more thoughtfully.</p>
+    <p class="poster-caption">THINK BEFORE YOU CLICK</p>
+    <div class="poster-checks" aria-label="Five checks before buying">
+      <span class="poster-check">🛍️ NEEDS</span><span class="poster-check">🏷️ PRICE</span><span class="poster-check">👕 QUALITY</span><span class="poster-check">📦 RETURNS</span><span class="poster-check">🌍 ENVIRONMENT</span>
+    </div>
+    <span class="pill">10 categories · 10 rounds each · 100 choices</span>
+  </div></header>
+  <main>
+    <div id="game">
+      <div class="sound-row"><span class="music-note">🎵 Gentle background music + sound effects</span><button id="soundBtn" class="sound-toggle" aria-pressed="true">🎵 Music & sounds on</button></div>
+      <div class="topline"><span id="categoryCounter" class="progress-label">CATEGORY 1 OF 10</span><span id="roundCounter" class="progress-label">ROUND 1 OF 100</span></div>
+      <div class="progress-track" aria-label="Game progress"><div id="progressFill" class="progress-fill"></div></div>
+      <section class="panel" aria-live="polite">
+        <div class="category-row"><div id="categoryIcon" class="category-icon">🧠</div><div><div class="eyebrow">Your current category</div><h2 id="categoryTitle" class="category-title">Impulse vs intention</h2></div></div>
+        <p id="prompt" class="prompt">You see something cool online. What do you choose?</p>
+        <div id="choices" class="choices"></div>
+        <div id="feedback" class="feedback"><strong id="feedbackTitle">Nice choice!</strong><span id="feedbackText"></span></div>
+        <div id="encouragement" class="encouragement" role="status" aria-live="polite">💚 Every choice is a chance to learn. You can pause, rethink, and try again!</div>
+        <div class="actions"><button id="nextBtn" class="btn btn-primary" disabled>Next choice →</button><button id="skipBtn" class="btn btn-secondary">Skip this one</button><button id="restartBtn" class="btn btn-secondary">Start over ↻</button></div>
+      </section>
+      <p class="bottom-note">There isn't always one perfect answer. The goal is to pause, compare, and choose with intention.</p>
+    </div>
+    <section id="finish" class="panel finish">
+      <div class="big">🌿</div><div class="eyebrow">You made it through all 100!</div><h2>Small pause. Bigger impact.</h2>
+      <p>You finished every category. Remember the 30-second rule: pause, ask if you need it, check if it's worth it, and consider the impact before buying.</p>
+      <div id="finishGrid" class="finish-grid"></div>
+      <button id="playAgain" class="btn btn-primary">Play again ↻</button>
+    </section>
+  </main>
+  <footer>Think before you click. Choose what works for you and the planet. 💚</footer>
+</div>
+<script>
+const categories = [
+ {title:"Impulse vs intention",icon:"🧠",items:[
+ ["Buy it right now","Wait 30 seconds and rethink","A short pause can help separate a real need from a passing urge."],
+ ["Add it to cart instantly","Ask: do I really need it?","A quick question can prevent an unnecessary purchase."],
+ ["Buy because it's trending","Choose what you genuinely like","Trends move on; thoughtful choices should fit your needs."],
+ ["Shop when bored","Find something else to do first","Shopping doesn't have to be a cure for boredom."],
+ ["Buy because an ad says so","Check whether it solves a real problem","Ads are designed to catch attention, not decide what you need."],
+ ["Rush before a countdown ends","Check if the deal is actually useful","Urgency messages can push people to buy too quickly."],
+ ["Buy the first thing you see","Compare a couple of options","A little comparison can help you choose better."],
+ ["Copy a creator's purchase","Decide based on your own needs","Someone else's favourite may not suit you."],
+ ["Buy it to fit in","Choose what feels right for you","Your choices don't have to follow everyone else's."],
+ ["Pause, then decide","Never question the purchase","A thoughtful pause gives you more control."]] },
+ {title:"Need vs want",icon:"🛒",items:[
+ ["A school notebook when yours is full","A fancy notebook when yours has pages left","School supplies you need come first; the fancy one can wait."],
+ ["Replace shoes that no longer fit","Buy another pair just because it's trending","Comfort and fit are needs; another trendy pair may be a want."],
+ ["A lunchbox for bringing your lunch","A collectible toy you saw online","The lunchbox serves a regular purpose; the toy is an optional extra."],
+ ["A sturdy backpack for school","A designer backpack when yours works","A working backpack can meet the need without an upgrade."],
+ ["Refill pens that have run out","Decorative pens you may rarely use","Refills help you keep working; decorative extras depend on your budget and use."],
+ ["A raincoat during rainy weather","A new fashion accessory for one outfit","Protection from the rain is practical; the accessory may be a want."],
+ ["A charging cable for a broken one","New earbuds when your current ones work","Replacing a broken essential is different from upgrading something that works."],
+ ["A reusable water bottle if you need one","Another tumbler in a new colour","The useful bottle meets a need; the extra colour may simply be tempting."],
+ ["A required textbook for class","Merch from your favourite creator","School materials may be essential; merch is usually an optional purchase."],
+ ["Replace a broken study lamp","Buy decorative LED lights for your room","Light for studying may be a need; decorative lights are more of a want."]] },
+ {title:"Price & value",icon:"💸",items:[
+ ["Choose the lowest price only","Compare quality and price","The cheapest option may not last as long."],
+ ["Buy because it says 50% off","Check the final price and usefulness","A discount isn't a saving if you didn't need the item."],
+ ["Ignore delivery fees","Check the total before paying","The total cost matters more than the headline price."],
+ ["Buy a bundle you won't finish","Buy only the amount you need","Extra items can become extra waste."],
+ ["Choose a product with no details","Read the description and reviews","Useful information can help avoid disappointment."],
+ ["Buy without checking return rules","Read the return policy first","Know what happens if the item doesn't work out."],
+ ["Pay for a feature you won't use","Pick features that matter to you","Value depends on your actual use."],
+ ["Buy the familiar brand automatically","Compare suitable alternatives","Compare fairly instead of assuming a logo means better."],
+ ["Ignore durability","Consider how long it may last","A longer-lasting item can be better value."],
+ ["Check the full cost","Look only at the sticker price","A clear total helps you make an informed decision."]] },
+ {title:"Local vs online",icon:"🏪",items:[
+ ["Order a tiny item separately","Check a nearby shop first","A local shop may have it without extra packaging or delivery."],
+ ["Assume online is always cheaper","Compare with a local store","Prices and convenience can vary."],
+ ["Ignore neighborhood shops","Consider supporting a local seller","Local purchases can help keep neighborhood businesses going."],
+ ["Order several items one by one","Combine items into one order","One planned delivery may reduce repeat trips and packaging."],
+ ["Buy from an unknown seller","Check seller identity and reviews","Seller checks can reduce the risk of scams or fakes."],
+ ["Choose delivery for every small need","Walk to a nearby shop when practical","A short local trip may be a convenient alternative."],
+ ["Never ask a shopkeeper","Ask about availability or alternatives","A conversation can reveal options you hadn't considered."],
+ ["Assume local means expensive","Compare quality and total price","Compare actual options, not assumptions."],
+ ["Buy online without checking stock nearby","Check local availability first","You might get what you need sooner from a nearby store."],
+ ["Balance online and local shopping","Use only one way for everything","Different purchases suit different methods."]] },
+ {title:"Planet-friendly picks",icon:"🌍",items:[
+ ["Choose lots of single-use packaging","Look for less packaging","Less unnecessary packaging means less waste."],
+ ["Take a new bag each time","Bring a reusable bag","A reusable bag is useful when used repeatedly."],
+ ["Buy a disposable version","Consider a durable reusable version","Reusable can be a good choice when it fits the task."],
+ ["Order one item in each delivery","Combine orders when practical","Fewer separate deliveries may reduce packaging and trips."],
+ ["Throw packaging away without checking","Sort it according to local rules","Recycling depends on local collection systems and material types."],
+ ["Pick excess gift wrapping","Choose simple or reusable wrapping","Presentation can be lovely without lots of waste."],
+ ["Buy a new item for one event","Borrow or reuse if possible","Short-term needs may not require a new purchase."],
+ ["Ignore product lifespan","Consider durability and repair","Items that last can mean fewer replacements."],
+ ["Choose eco claims without checking","Look for clear, specific information","Vague green claims aren't always meaningful."],
+ ["Ask what happens after use","Think only about unboxing","Considering an item's whole life can improve choices."]] },
+ {title:"Packaging choices",icon:"📦",items:[
+ ["Pick extra gift boxes","Choose minimal packaging","Less packaging can mean less material to discard."],
+ ["Accept a bag for one small item","Carry it without a bag if practical","Skip extra bags when you don't need them."],
+ ["Buy tiny items wrapped separately","Look for sensible packaging","Packaging should protect a product without being excessive."],
+ ["Throw a sturdy box away instantly","Reuse it if useful","A second use can extend a box's life."],
+ ["Choose disposable cutlery with delivery","Use your own cutlery","You can skip single-use extras when they're unnecessary."],
+ ["Order each snack separately","Plan a combined order","Planning can reduce repeated packaging."],
+ ["Ignore packaging symbols","Check local recycling guidance","Symbols can help, but local rules decide what is accepted."],
+ ["Choose a product with layers of wrapping","Compare less-packaged options","Consider packaging alongside quality and safety."],
+ ["Use a new parcel bag once","Reuse suitable bags safely","Reuse is helpful when the material remains suitable."],
+ ["Ask whether packaging is necessary","Assume more packaging is better","The right amount protects goods without unnecessary waste."]] },
+ {title:"Safe online shopping",icon:"🔐",items:[
+ ["Click a random payment link","Use the official app or website","Official channels help reduce exposure to fraudulent links."],
+ ["Share an OTP with someone","Keep OTPs private","Legitimate support should not need you to disclose an OTP."],
+ ["Trust a deal that seems unreal","Verify the seller and offer","Unusually attractive deals deserve a careful check."],
+ ["Reuse the same weak password","Use a strong, unique password","Unique passwords help limit damage if one account is compromised."],
+ ["Ignore two-factor authentication","Enable it where available","An extra sign-in check can improve account security."],
+ ["Buy from a suspicious pop-up","Navigate to the known official site","Avoid entering payment details on suspicious pages."],
+ ["Skip the seller's details","Check contact and return information","Clear seller details help you assess trustworthiness."],
+ ["Pay before checking the final amount","Review your order total","Check the price, fees, and items before confirming."],
+ ["Post order details publicly","Keep personal and delivery details private","Personal information should be shared only when needed."],
+ ["Pause and verify","Click first and hope","A short safety check is worth the time."]] },
+ {title:"Quality & authenticity",icon:"🔎",items:[
+ ["Buy from an unverified listing","Check the seller's reputation","Seller history and reviews can offer useful clues."],
+ ["Trust a product photo alone","Read details and real-user reviews","Photos may not show the whole story."],
+ ["Ignore suspiciously low prices","Compare with trusted sellers","A very low price can be a warning sign, though not proof."],
+ ["Skip size and material details","Check specifications before buying","Details help you choose an item that suits you."],
+ ["Buy a possible counterfeit","Choose a trustworthy source","Authenticity matters for quality, safety, and fair trade."],
+ ["Ignore warranty information","Check warranty and support","After-sales support can matter if something goes wrong."],
+ ["Buy without checking compatibility","Confirm it fits your device or needs","Compatibility checks prevent avoidable returns."],
+ ["Assume every review is genuine","Look for balanced, detailed feedback","Be cautious of repetitive or suspicious reviews."],
+ ["Ignore the product condition","Check whether it's new, used, or refurbished","Condition affects price and expectations."],
+ ["Check facts before checkout","Decide from the picture alone","A few checks can make your decision more informed."]] },
+ {title:"Mindful money habits",icon:"🪙",items:[
+ ["Spend the moment money arrives","Set a plan for spending","A plan helps you prioritise what matters."],
+ ["Buy now and forget the budget","Check what you can comfortably spend","Know your limits before committing."],
+ ["Add many small extras","Review the cart before checkout","Small add-ons can increase the total quickly."],
+ ["Buy to cheer up every time","Try a non-shopping mood reset first","A walk, music, or chat can be an alternative."],
+ ["Ignore subscriptions after a trial","Check recurring charges","A small monthly fee can continue unnoticed."],
+ ["Choose buy-now pressure","Take time to compare","You can make a clearer decision without rushing."],
+ ["Spend without tracking","Keep a simple record","Seeing spending patterns can help you plan."],
+ ["Buy just to use a coupon","Check whether the purchase is needed","A coupon doesn't automatically make something worthwhile."],
+ ["Forget savings goals","Consider your priorities first","Your money can support goals beyond this one purchase."],
+ ["Think about cost and use","Focus only on getting something new","A purchase should make sense beyond the excitement of buying."]] },
+ {title:"The 30-second challenge",icon:"⏳",items:[
+ ["Pause and take one breath","Tap buy immediately","One breath gives you a moment to decide."],
+ ["Ask: need or want?","Skip the question","Naming the reason can make the choice clearer."],
+ ["Check the total cost","Look only at the product","Delivery and other fees count too."],
+ ["Consider waste and packaging","Ignore what happens afterwards","A product's impact doesn't end at checkout."],
+ ["Compare one alternative","Assume the first option is best","A quick comparison can reveal a better fit."],
+ ["Check seller trust","Trust every link","A safety check helps protect your information."],
+ ["Wait if you're unsure","Buy to stop thinking about it","Uncertainty can be a good reason to pause."],
+ ["Ask if you'll use it often","Imagine only the unboxing","Think beyond the first exciting moment."],
+ ["Choose with a clear reason","Buy because it's trending","Your reason should be more important than hype."],
+ ["Pause for 30 seconds","Forget the rule completely","A small pause can turn an impulse into a choice."]] }
+];
+let categoryIndex=0, itemIndex=0, selected=-1, completed=0, history=[];
+let soundOn=true, audioContext=null, musicTimer=null, musicStep=0;
+const $=id=>document.getElementById(id);
+function playTone(kind='tap'){
+ if(!soundOn)return;
+ try{
+  audioContext=audioContext||new (window.AudioContext||window.webkitAudioContext)();
+  if(audioContext.state==='suspended')audioContext.resume();
+  const osc=audioContext.createOscillator(), gain=audioContext.createGain();
+  const now=audioContext.currentTime;
+  osc.type='sine'; osc.frequency.setValueAtTime(kind==='win'?660:kind==='next'?520:420,now);
+  if(kind==='win')osc.frequency.exponentialRampToValueAtTime(990,now+.16);
+  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.11,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+.19);
+  osc.connect(gain);gain.connect(audioContext.destination);osc.start(now);osc.stop(now+.2);
+ }catch(e){}
+}
+function playMusicNote(freq){
+ if(!soundOn)return;
+ try{
+  audioContext=audioContext||new (window.AudioContext||window.webkitAudioContext)();
+  if(audioContext.state==='suspended')audioContext.resume();
+  const osc=audioContext.createOscillator(), gain=audioContext.createGain(), now=audioContext.currentTime;
+  osc.type='sine';osc.frequency.setValueAtTime(freq,now);
+  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.018,now+.12);gain.gain.setValueAtTime(.018,now+.42);gain.gain.exponentialRampToValueAtTime(.0001,now+.8);
+  osc.connect(gain);gain.connect(audioContext.destination);osc.start(now);osc.stop(now+.82);
+ }catch(e){}
+}
+function startMusic(){
+ if(!soundOn||musicTimer)return;
+ const melody=[392,494,587,494,440,523,659,523,392,494,587,659,523,494,440,392];
+ playMusicNote(melody[musicStep%melody.length]);musicStep++;
+ musicTimer=setInterval(()=>{if(soundOn){playMusicNote(melody[musicStep%melody.length]);musicStep++;}},520);
+}
+function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}}
+function sparkles(){
+ const symbols=['✨','🌿','💚','⭐'];
+ for(let i=0;i<7;i++){const s=document.createElement('span');s.className='spark';s.textContent=symbols[i%symbols.length];s.style.left=(25+Math.random()*50)+'%';s.style.top=(38+Math.random()*25)+'%';document.body.appendChild(s);setTimeout(()=>s.remove(),900);}
+}
+function render(){
+ const cat=categories[categoryIndex], item=cat.items[itemIndex];
+ $('categoryCounter').textContent=`CATEGORY ${categoryIndex+1} OF ${categories.length}`;
+ $('roundCounter').textContent=`ROUND ${completed+1} OF 100`;
+ $('progressFill').style.width=`${completed}%`;
+ $('categoryIcon').textContent=cat.icon; $('categoryTitle').textContent=cat.title;
+ $('prompt').textContent='Take 30 seconds to think. Which would you choose?';
+ $('choices').innerHTML='';
+ [0,1].forEach((n)=>{const b=document.createElement('button');b.className='choice';b.type='button';b.innerHTML=`<span class="letter">OPTION ${n===0?'A':'B'}</span><span class="words"></span>`;b.querySelector('.words').textContent=item[n];b.addEventListener('click',()=>choose(n));$('choices').appendChild(b);if(n===0){const or=document.createElement('div');or.className='or';or.innerHTML='<span>OR</span>'; $('choices').appendChild(or);}});
+ $('feedback').classList.remove('show');$('encouragement').classList.remove('show');$('nextBtn').disabled=true;$('nextBtn').textContent=completed===99?'See finish ✨':'Next choice →';
+ $('progressFill').style.width=`${completed}%`;
+ $('game').querySelector('.panel').classList.remove('enter');void $('game').querySelector('.panel').offsetWidth;$('game').querySelector('.panel').classList.add('enter');
+}
+function choose(n){if(selected!==-1)return;selected=n;playTone('tap');const item=categories[categoryIndex].items[itemIndex];const buttons=[...$('choices').querySelectorAll('.choice')];buttons[n].classList.add('selected','pop');$('feedbackTitle').textContent=n===1?'Thoughtful pick!':'Good to consider!';$('feedbackText').textContent=item[2];$('feedback').classList.add('show');const encouragingNotes=["No worries! Shopping wisely is a skill you build one choice at a time. 💚","It's okay to get it wrong—now you've got one more thing to think about next time! 🌱","Don't be discouraged! The goal isn't perfection; it's to pause and learn. ✨","A little rethink goes a long way. You can make a different choice next time! 💪","Every shopper learns. Take the tip, keep going, and give yourself credit for trying! 🌿"];if(n===0){$('encouragement').textContent='💚 '+encouragingNotes[(completed+categoryIndex+itemIndex)%encouragingNotes.length];$('encouragement').classList.add('show');}else{$('encouragement').textContent='🌟 Keep it up! Thoughtful choices get easier with practice.';$('encouragement').classList.add('show');} $('nextBtn').disabled=false;history.push({category:categories[categoryIndex].title,choice:item[n]});}
+function advance(){if(selected===-1)return;playTone('next');completed++;selected=-1;if(completed>=100){finish();return;}itemIndex++;if(itemIndex>=10){itemIndex=0;categoryIndex++;}render();}
+function skip(){if(completed>=100)return;playTone('next');completed++;selected=-1;if(completed>=100){finish();return;}itemIndex++;if(itemIndex>=10){itemIndex=0;categoryIndex++;}render();}
+function finish(){playTone('win');sparkles();$('game').style.display='none';$('finish').classList.add('show');$('progressFill').style.width='100%';$('finishGrid').innerHTML=categories.map(c=>`<div class="finish-item">${c.icon} <strong>${c.title}</strong><br>10 choices explored</div>`).join('');}
+function restart(){categoryIndex=0;itemIndex=0;selected=-1;completed=0;history=[];$('game').style.display='block';$('finish').classList.remove('show');render();window.scrollTo({top:0,behavior:'smooth'});}
+$('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;if(soundOn){$('soundBtn').textContent='🎵 Music & sounds on';$('soundBtn').setAttribute('aria-pressed','true');playTone('tap');startMusic();}else{stopMusic();$('soundBtn').textContent='🔇 Music & sounds off';$('soundBtn').setAttribute('aria-pressed','false');}});
+$('choices').addEventListener('click',()=>{if(soundOn)startMusic();},{once:true});
+$('nextBtn').addEventListener('click',advance);$('skipBtn').addEventListener('click',skip);$('restartBtn').addEventListener('click',restart);$('playAgain').addEventListener('click',restart);render();
+</script>
+</body>
+</html>
